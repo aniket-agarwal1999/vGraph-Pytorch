@@ -6,7 +6,7 @@ import torch_geometric as pyg
 from torch_geometric.utils import structured_negative_sampling
 
 class Model(nn.Module):
-    def __init__(self, siz  e, categories, embedding_dim=128, negative_sample=False):
+    def __init__(self, size, categories, embedding_dim=128, negative_sample=False):
         '''
         size: the number of vertices in the case 
         categories: the number of categories that the nodes need to classified in

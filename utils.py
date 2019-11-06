@@ -22,7 +22,7 @@ def load_checkpoint(ckpt_path, map_location='cpu'):
     print(' [*] Loading checkpoint from %s succeed!' % ckpt_path)
     return ckpt
 
-def similarity_measure(edge_index, w, c):
+def similarity_measure(edge_index, w, c, gpu_id):
     '''
     Used for calculating the coefficient alpha in the case of community smoothness loss
     Parameters:
@@ -32,6 +32,7 @@ def similarity_measure(edge_index, w, c):
     '''
 
     alpha = torch.zeros(w.shape[0], 1)
+    alpha = cuda(alpha, gpu_id)
     for i in range(w.shape[0]):
         l1 = edge_index[1, :][edge_index[0, :] == w[i]].tolist()
         l2 = edge_index[1, :][edge_index[0, :] == c[i]].tolist()
@@ -43,6 +44,14 @@ def similarity_measure(edge_index, w, c):
         alpha[i, 0] = similarity
     
     return alpha
+
+def cuda(xs, gpu_id):
+    if torch.cuda.is_available():
+        if not isinstance(xs, (list, tuple)):
+            return xs.cuda(int(gpu_id[0]))
+        else:
+            return [x.cuda(int(gpu_id[0])) for x in xs]
+    return xs
 
 
     

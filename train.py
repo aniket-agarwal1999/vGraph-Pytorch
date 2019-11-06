@@ -17,6 +17,7 @@ parser.add_argument('--lamda', type=float, default=100.0)   ## For the smoothnes
 parser.add_argument('--checkpoint_dir', type=str, default='./checkpoints')
 parser.add_argument('--embedding_dim', type=int, default=128)
 parser.add_argument('--dataset', type=str, choices=['Cora', 'Citeseer'], default='Cora')
+parser.add_argument('--gpu_id', type=str, default='0')
 parser.add_argument('--tensorboard_dir', type=str, default='./tensorboard_curves')
 
 
@@ -36,6 +37,9 @@ if __name__ == '__main__':
     size = dataset.edge_index.shape[1]
     categories = torch.unique(dataset.y).shape[0]
 
+    edge_index = dataset.edge_index
+    edge_index = utils.cuda(edge_index, args.gpu_id)
+
     ## For visualization of loss curves
     if not os.path.isdir(args.tensorboard_dir):
         os.makedirs(args.tensorboard_dir)
@@ -43,6 +47,7 @@ if __name__ == '__main__':
 
     ## Model for embedding and stuff
     model = Model(size=size, categories=categories, embedding_dim=128, negative_sample=False)
+    model = utils.cuda(model, args.gpu_id)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
     
@@ -77,14 +82,17 @@ if __name__ == '__main__':
         prior_c = torch.cat((prior[prior.shape[0]//2:, :], prior[0:prior.shape[0]//2, :]))
 
         d = (prior_c - prior)**2
-        alpha = utils.similarity_measure(edge_index, w, c)
+        alpha = utils.similarity_measure(edge_index, w, c, args.gpu_id)
 
         regularization_loss = alpha*d
+        regularization_loss = regularization_loss.mean()
 
         total_loss = vgraph_loss + args.lamda*regularization_loss
 
         total_loss.backward()
         optimizer.step()
+
+        print('Epoch: ', epoch+1, ' done!!')
 
         if epoch % 100 == 0:
             lr_scheduler.step()
