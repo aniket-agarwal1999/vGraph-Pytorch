@@ -42,7 +42,7 @@ class Model(nn.Module):
         Parameters:
         z: the sampled community using gumbel softmax reparametrization trick
         edge_index: edges in the graph
-        negative_samples: number of negative samples to be used for the optimization
+        num_negative_samples: number of negative samples to be used for the optimization
 
         The function has been partially inspired from this file: https://github.com/DMPierre/LINE/blob/master/utils/line.py
         '''
@@ -84,6 +84,6 @@ class Model(nn.Module):
         else:
             recon_c = self.negative_sampling_line(z, edge_index, num_negative_samples)
 
-        return prior, recon_c, F.softmax(q, dim=-1)
+        return prior, recon_c, F.softmax(q, dim=-1)    ### Here the end term F.softmax(q) cannot be  gumbel_softmax
 
 

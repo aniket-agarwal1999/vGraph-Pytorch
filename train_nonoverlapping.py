@@ -68,6 +68,9 @@ if __name__ == '__main__':
         start_epoch = 0
 
     for epoch in range(start_epoch, args.epochs):
+        
+        optimizer.zero_grad()
+        model.train()
 
         w = torch.cat((edge_index[0, :], edge_index[1, :]))
         c = torch.cat((edge_index[1, :], edge_index[0, :]))
@@ -93,11 +96,22 @@ if __name__ == '__main__':
         optimizer.step()
 
         print('Epoch: ', epoch+1, ' done!!')
+        print('Total error: ', total_loss)
 
         if epoch % 100 == 0:
             lr_scheduler.step()
+            modularity, macro_F1, micro_F1 = utils.calculate_nonoverlap_losses(model, dataset, edge_index)
+            f = open(args.dataset + '_results.txt', 'a+')
+            f.write('Epoch :', epoch, ' modularity: ', modularity, ' macro_F1: ', macro_F1, ' micro_F1: ', micro_F1, ' \n')
+
         
         writer_tensorboard.add_scalars('Total Loss', {'vgraph_loss':vgraph_loss, 'regularization_loss':regularization_loss}, epoch)
+
+        ### Saving the checkpoint
+        utils.save_checkpoint({'epoch':epoch+1,
+                               'model':model.state_dict(),
+                               'optimizer':optimizer.state_dict()},
+                               args.checkpoint_dir + '/latest_model_'+args.dataset+'.ckpt')
     
     
     writer_tensorboard.close()
