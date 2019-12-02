@@ -64,41 +64,30 @@ def cuda(xs, gpu_id):
     return xs
 
 
-def calculate_nonoverlap_losses(model, dataset, edge_index)
-    '''
-    For calculating losses pertaining to the non-overlapping dataset, namely, Macro F1, Micro F1, Modularity, NMI
-    '''
-    model.eval()
-    labels = dataset.y
-    w = edge_index[0, :]
-    c = edge_index[1, :]
-    _, _, q = model(w, c, edge_index)
+### THIS SECTION WILL BE ADDED ON AND CONTAINS THE ACCURACY MEASURES FOR OVERLAPPING AND NON-OVERLAPPING SUBPROBLEMS
+# def calculate_nonoverlap_losses(model, dataset, edge_index):
+#     '''
+#     For calculating losses pertaining to the non-overlapping dataset, namely, Macro F1, Micro F1, Modularity, NMI
+#     '''
+#     model.eval()
+#     labels = dataset.y
+#     w = edge_index[0, :]
+#     c = edge_index[1, :]
+#     _, _, q = model(w, c, edge_index)
 
-    new_labels = torch.zeros(w.shape[0], 1)
-    for i in range(w.shape[0]):
-        new_labels[i] = labels[w[i]]
+#     new_labels = torch.zeros(w.shape[0], 1)
+#     for i in range(w.shape[0]):
+#         new_labels[i] = labels[w[i]]
     
-    kmeans = KMeans(n_clusters=torch.unique(labels).shape[0], random_state=0).fit(q)
+#     kmeans = KMeans(n_clusters=torch.unique(labels).shape[0], random_state=0).fit(q.detach().cpu().numpy())
 
-    ###For calculating modularity
-    assignment = {i: int(kmeans.labels_[i]) for i in range(q.shape[0])}
-    networkx_graph = pyg.utils.to_networkx(dataset)
-    modularity = community.modularity(assignment, dataset)
+#     ###For calculating modularity
+#     assignment = {i: int(kmeans.labels_[i]) for i in range(q.shape[0])}
+#     networkx_graph = pyg.utils.to_networkx(dataset)
+#     modularity = community.modularity(assignment, networkx_graph)
 
-    ###For calculating macro and micro F1 score
-    macro_F1 = metrics.f1_score(new_labels.numpy(), kmeans.labels_, average='macro')
-    micro_F1 = metrics.f1_score(new_labels.numpy(), kmeans.labels_, average='micro')
+#     ###For calculating macro and micro F1 score
+#     macro_F1 = metrics.f1_score(new_labels.numpy(), kmeans.labels_, average='macro')
+#     micro_F1 = metrics.f1_score(new_labels.numpy(), kmeans.labels_, average='micro')
 
-    return modularity, macro_F1, micro_F1
-
-def calculate_jaccard():
-    '''
-    ## This is for the overlapping case
-    ''' 
-
-
-
-def calculate_f1():
-    '''
-    ## This is for the overlapping case
-    '''
+#     return modularity, macro_F1, micro_F1

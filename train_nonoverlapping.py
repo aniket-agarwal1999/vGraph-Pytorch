@@ -21,8 +21,6 @@ parser.add_argument('--gpu_id', type=str, default='0')
 parser.add_argument('--tensorboard_dir', type=str, default='./tensorboard_curves')
 
 
-
-
 if __name__ == '__main__':
     args = parser.parse_args()
 
@@ -100,9 +98,9 @@ if __name__ == '__main__':
 
         if epoch % 100 == 0:
             lr_scheduler.step()
-            modularity, macro_F1, micro_F1 = utils.calculate_nonoverlap_losses(model, dataset, edge_index)
-            f = open(args.dataset + '_results.txt', 'a+')
-            f.write('Epoch :', epoch, ' modularity: ', modularity, ' macro_F1: ', macro_F1, ' micro_F1: ', micro_F1, ' \n')
+            # modularity, macro_F1, micro_F1 = utils.calculate_nonoverlap_losses(model, dataset, edge_index)
+            # f = open(args.dataset + '_results.txt', 'a+')
+            # f.write('Epoch :', epoch, ' modularity: ', modularity, ' macro_F1: ', macro_F1, ' micro_F1: ', micro_F1, ' \n')
 
         
         writer_tensorboard.add_scalars('Total Loss', {'vgraph_loss':vgraph_loss, 'regularization_loss':regularization_loss}, epoch)
